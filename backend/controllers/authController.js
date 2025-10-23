@@ -4,10 +4,11 @@ const User = require('../models/User');
 
 const COOKIE_OPTIONS = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === 'production', // only secure in prod
-  sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax', // allow cross-origin for dev
+  secure: true,              // must be true for HTTPS (Render uses HTTPS)
+  sameSite: 'None',          // required for cross-origin cookies
   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 };
+
 
 
 // Signup
