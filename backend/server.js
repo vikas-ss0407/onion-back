@@ -2,38 +2,49 @@ const express = require('express');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const cookieParser = require('cookie-parser');
-const cors = require('cors'); // <-- Add this
+const cors = require('cors');
+
 dotenv.config();
+
 const authRoutes = require('./routes/auth');
 const billRoutes = require('./routes/bills');
 const boxRoutes = require('./routes/boxes');
 const shopRoutes = require('./routes/shops');
 const thingSpeakRoutes = require("./routes/thingspeak");
 
-
+// Connect to MongoDB
 connectDB();
 
 const app = express();
+
+// Middleware
 app.use(express.json());
 app.use(cookieParser());
 
-// CORS setup
+// CORS setup: allow your frontend URLs with credentials
 app.use(cors({
-  origin: ['http://localhost:5173','https://onion-frontend.onrender.com'], // frontend URL
-  credentials: true,               // allow cookies to be sent
+  origin: ['http://localhost:5173', 'https://onion-frontend.onrender.com'],
+  credentials: true,
 }));
 
-// Test route to check backend deployment
+// Optional: handle preflight requests (browsers send OPTIONS before actual requests)
+app.options('*', cors({
+  origin: ['http://localhost:5173', 'https://onion-frontend.onrender.com'],
+  credentials: true,
+}));
+
+// Test route
 app.get('/', (req, res) => {
   res.send('🚀 Backend deployed successfully!');
 });
 
-// Routes
+// API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/bills', billRoutes);
 app.use('/api/boxes', boxRoutes);
 app.use('/api/shops', shopRoutes);
-app.use("/api/thingspeak", thingSpeakRoutes);
+app.use('/api/thingspeak', thingSpeakRoutes);
 
+// Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
