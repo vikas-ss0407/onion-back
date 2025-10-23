@@ -6,6 +6,7 @@ const cors = require('cors');
 
 dotenv.config();
 
+// Routes
 const authRoutes = require('./routes/auth');
 const billRoutes = require('./routes/bills');
 const boxRoutes = require('./routes/boxes');
@@ -21,19 +22,13 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-// CORS setup: allow your frontend URLs with credentials
+// CORS setup for frontend with credentials
 app.use(cors({
   origin: ['http://localhost:5173', 'https://onion-frontend.onrender.com'],
-  credentials: true,
+  credentials: true, // allow cookies
 }));
 
-// Optional: handle preflight requests (browsers send OPTIONS before actual requests)
-app.options('*', cors({
-  origin: ['http://localhost:5173', 'https://onion-frontend.onrender.com'],
-  credentials: true,
-}));
-
-// Test route
+// Test route to check backend deployment
 app.get('/', (req, res) => {
   res.send('🚀 Backend deployed successfully!');
 });
