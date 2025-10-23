@@ -19,7 +19,7 @@ app.use(cookieParser());
 
 // CORS setup
 app.use(cors({
-  origin: 'http://localhost:5173', // frontend URL
+  origin: ['http://localhost:5173','https://onion-frontend.onrender.com'], // frontend URL
   credentials: true,               // allow cookies to be sent
 }));
 
