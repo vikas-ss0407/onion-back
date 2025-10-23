@@ -2,12 +2,17 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
+// Cookie options: make secure conditional on environment so localhost/dev still works.
 const COOKIE_OPTIONS = {
   httpOnly: true,
-  secure: true,              // must be true for HTTPS (Render uses HTTPS)
-  sameSite: 'None',          // required for cross-origin cookies
+  secure: process.env.NODE_ENV === 'production', // only require secure in production
+  sameSite: 'None', // required for cross-origin cookies when using credentials
   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 };
+// Allow optional domain override (useful when frontend is hosted on a fixed domain)
+if (process.env.COOKIE_DOMAIN) {
+  COOKIE_OPTIONS.domain = process.env.COOKIE_DOMAIN;
+}
 
 
 
@@ -29,7 +34,9 @@ exports.signup = async (req, res) => {
       expiresIn: process.env.JWT_EXPIRES_IN,
     });
 
-    res.cookie('token', token, COOKIE_OPTIONS).json({
+    res.cookie('token', token, COOKIE_OPTIONS);
+    if (process.env.DEBUG_COOKIES === 'true') console.log('Set token cookie for user', user._id, 'options=', COOKIE_OPTIONS);
+    return res.json({
       user: { id: user._id, name: user.name, email: user.email, phone: user.phone, address: user.address },
     });
   } catch (err) {
@@ -52,7 +59,9 @@ exports.login = async (req, res) => {
       expiresIn: process.env.JWT_EXPIRES_IN,
     });
 
-    res.cookie('token', token, COOKIE_OPTIONS).json({
+    res.cookie('token', token, COOKIE_OPTIONS);
+    if (process.env.DEBUG_COOKIES === 'true') console.log('Set token cookie for user', user._id, 'options=', COOKIE_OPTIONS);
+    return res.json({
       user: { id: user._id, name: user.name, email: user.email, phone: user.phone, address: user.address },
     });
   } catch (err) {
@@ -64,6 +73,7 @@ exports.login = async (req, res) => {
 // Logout
 exports.logout = (req, res) => {
   res.clearCookie('token', COOKIE_OPTIONS);
+  if (process.env.DEBUG_COOKIES === 'true') console.log('Cleared token cookie');
   res.json({ message: 'Logged out' });
 };
 

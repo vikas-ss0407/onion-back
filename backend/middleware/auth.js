@@ -1,4 +1,4 @@
-// middleware/auth.js
+
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
@@ -16,8 +16,10 @@ module.exports = async function (req, res, next) {
     next();
   } catch (err) {
     if (err.name === 'TokenExpiredError') {
+      if (process.env.DEBUG_COOKIES === 'true') console.log('Auth middleware: token expired', err);
       return res.status(401).json({ message: 'Token expired. Please login again.' });
     }
+    if (process.env.DEBUG_COOKIES === 'true') console.log('Auth middleware: invalid token', err);
     return res.status(401).json({ message: 'Invalid token' });
   }
 };
